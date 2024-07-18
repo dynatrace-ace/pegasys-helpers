@@ -1,8 +1,6 @@
+import { Question } from "../types/Question";
 declare class QuestionSDK {
     constructor();
-    createQuestion(id: string, question: string): {
-        id: string;
-        question: string;
-    };
+    createQuestion(id: string, question: string): Question;
 }
 export default QuestionSDK;
