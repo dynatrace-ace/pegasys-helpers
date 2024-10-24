@@ -1,5 +1,48 @@
 class DTFunctions {
 
+
+ // A boilerplate function to perform a series of operations
+ async performOperations(
+  oauth_client_id: string,
+  oauth_client_secret: string,
+  dt_account_urn: string,
+  oauth_sso_endpoint: string,
+  dt_platform_environment: string,
+  documentType: string,
+  documentName: string,
+  validationId: string,
+  maxScore: number,
+  getScore: (auditInfo: any) => Promise<{ score: number, assertion_fails: any[] }>
+): Promise<{ validationId: string, maxScore: number, finalScore: number, auditInfo: any }> {
+  // Get the authorization header
+  let oauth_header = null;
+  const dt_access_token = await this.getOauthAccessToken(oauth_client_id, oauth_client_secret, dt_account_urn, oauth_sso_endpoint);
+  if (!dt_access_token) {
+    throw new Error("Failed to obtain access token");
+  }
+  oauth_header = await this.getAuthorizationHeader(dt_access_token);
+
+  // Get documents list
+  const documentsList = await this.getDocumentsList(dt_platform_environment, documentType, documentName, oauth_header);
+
+  // Get document details
+  const documentDetails = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
+
+  // Generate Audit Info
+  const auditInfo = await this.generateAuditInfo(documentsList, documentDetails);
+    // Get the score
+    const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo);
+    auditInfo.assertionFails = assertionFails;
+    console.log("auditInfo assertion fails:\n" + JSON.stringify(auditInfo.assertionFails, null, 2));
+
+    return {
+      validationId: validationId,
+      maxScore: maxScore,
+      finalScore: finalScore,
+      auditInfo: auditInfo
+    };
+  }
+
   // A utility function to get the OAuth access token
   async getOauthAccessToken(
     oauth_client_id: string,

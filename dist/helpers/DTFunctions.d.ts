@@ -1,4 +1,13 @@
 declare class DTFunctions {
+    performOperations(oauth_client_id: string, oauth_client_secret: string, dt_account_urn: string, oauth_sso_endpoint: string, dt_platform_environment: string, documentType: string, documentName: string, validationId: string, maxScore: number, getScore: (auditInfo: any) => Promise<{
+        score: number;
+        assertion_fails: any[];
+    }>): Promise<{
+        validationId: string;
+        maxScore: number;
+        finalScore: number;
+        auditInfo: any;
+    }>;
     getOauthAccessToken(oauth_client_id: string, oauth_client_secret: string, dt_account_urn: string, oauth_sso_endpoint: string): Promise<string | undefined>;
     getAuthorizationHeader(token: string): Promise<Headers>;
     getEntities(environment: string, entity_type: string, entity_name_to_query: string, headers: Headers): Promise<any>;
