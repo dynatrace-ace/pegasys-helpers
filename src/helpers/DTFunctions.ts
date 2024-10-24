@@ -104,6 +104,32 @@ class DTFunctions {
   
       return entitiesData;
     }
-  }
+
+  // A utility function to get the documents list
+  async getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any> {
+    const documentFilter = `name contains '${document_name_to_query}' and type == '${document_type}'`;
+    const request = new Request(`${environment}/platform/document/v1/documents?filter=${encodeURIComponent(documentFilter)}`, {
+      method: "GET",
+      headers: headers,
+    });
+
+    let documents = null;
+    try {
+      const response = await fetch(request);
+      if (response.ok) {
+        documents = await response.json();
+      } else {
+        const errorDetails = await response.text();
+        console.error("Document List Error:", response.status, errorDetails);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    return documents;
+  }    
+
+
+}
   
   export default DTFunctions;
