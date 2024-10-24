@@ -1,5 +1,45 @@
 class DTFunctions {
-    // A utility function to get the authorization header
+
+  // A utility function to get the OAuth access token
+  async getOauthAccessToken(
+    oauth_client_id: string,
+    oauth_client_secret: string,
+    dt_account_urn: string,
+    oauth_sso_endpoint: string
+  ): Promise<string | undefined> {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const urlencoded = new URLSearchParams();
+    urlencoded.append("grant_type", "client_credentials");
+    urlencoded.append("client_id", oauth_client_id);
+    urlencoded.append("client_secret", oauth_client_secret);
+    urlencoded.append("scope", "document:documents:read document:documents:write document:environment-shares:read document:direct-shares:read ");
+    urlencoded.append("resource", dt_account_urn);
+
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: myHeaders,
+      body: urlencoded,
+      redirect: "follow"
+    };
+
+    try {
+      const response = await fetch(oauth_sso_endpoint, requestOptions);
+      const result = await response.json();
+      return result.access_token;
+    } catch (error: any) {
+      let errorDetails;
+      if (error.response) {
+        errorDetails = await error.response.text();
+        console.error("oAuth Access Token Error:", error.response.status, errorDetails);
+      } else {
+        console.error("oAuth Access Token Error:", error.message);
+      }
+    }
+  }
+
+  // A utility function to get the authorization header
     async getAuthorizationHeader(token: string): Promise<Headers> {
       // Create the headers object
       const headers = new Headers();
