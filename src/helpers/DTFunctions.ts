@@ -160,6 +160,10 @@ class DTFunctions {
       return documentDetails;
     }
 
+    checkKeywordsExistence(inputValue: string, keywords: string[]): boolean {
+      return keywords.every(keyword => inputValue.toLowerCase().includes(keyword.toLowerCase()));
+    }
+
 }
-  
+
   export default DTFunctions;

@@ -5,5 +5,6 @@ declare class DTFunctions {
     getEntitiesData(environment: string, entitiesList: any, headers: Headers): Promise<any[]>;
     getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any>;
     getDocumentDetails(environment: string, documentsList: any, headers: Headers): Promise<any[]>;
+    checkKeywordsExistence(inputValue: string, keywords: string[]): boolean;
 }
 export default DTFunctions;
