@@ -160,6 +160,24 @@ class DTFunctions {
       return documentDetails;
     }
 
+   // A utility function to generate audit info
+  async generateAuditInfo(documentList: any, documentDetails: any): Promise<any> {
+    let audit_info: any = {};
+
+    if (documentList != null) {
+      audit_info["documentList"] = documentList;
+    }
+
+    if (documentDetails != null) {
+      audit_info["documentDetails"] = documentDetails;
+    }
+
+    audit_info.assertionFails = [];
+
+    return audit_info;
+  }   
+
+
     checkKeywordsExistence(inputValue: string, keywords: string[]): boolean {
       return keywords.every(keyword => inputValue.toLowerCase().includes(keyword.toLowerCase()));
     }
