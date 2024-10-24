@@ -4,7 +4,7 @@ class DTFunctions {
       // Create the headers object
       const headers = new Headers();
       // Add the authorization header
-      headers.set("Authorization", "Api-Token " + token);
+      headers.append("Authorization", "Bearer " + token);
       return headers;
     }
   
