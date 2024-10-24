@@ -129,6 +129,36 @@ class DTFunctions {
     return documents;
   }    
 
+    // A utility function to get the document details
+    async getDocumentDetails(environment: string, documentsList: any, headers: Headers): Promise<any[]> {
+      if (documentsList === null) {
+        return [];
+      }
+  
+      let documentDetails: any[] = [];
+      const requestOptions: RequestInit = {
+        method: "GET",
+        headers: headers,
+      };
+  
+      for (const document of documentsList.documents) {
+        const documentId = String(document.id);
+        try {
+          const response = await fetch(`${environment}/platform/document/v1/documents/${documentId}/content`, requestOptions);
+          if (response.ok) {
+            const result = await response.json();
+            documentDetails.push(result);
+          } else {
+            const errorDetails = await response.text();
+            console.error("Document Details Error:", response.status, errorDetails);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+  
+      return documentDetails;
+    }
 
 }
   
