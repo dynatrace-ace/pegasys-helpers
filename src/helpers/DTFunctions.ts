@@ -60,14 +60,15 @@ class DTFunctions {
     dt_access_token: string,
     validationId: string,
     maxScore: number,
-    getScore: (auditInfo: any) => Promise<{ score: number, assertion_fails: any[] }>,
     entity_type: string,
     entity_name_to_query: string,
     config_endpoint: string,
     config_name_to_query: string,
     config_endpoint_extra_param: string,
     settings_schema_id: string,
-    settings_scope: string
+    settings_scope: string,
+    getScore: (auditInfo: any) => Promise<{ score: number, assertion_fails: any[] }>,
+
   ): Promise<{ validationId: string, maxScore: number, finalScore: number, auditInfo: any }> {
     // Get the authorization header
     const auth_header = await this.getAuthorizationHeaderGen2(dt_access_token);
