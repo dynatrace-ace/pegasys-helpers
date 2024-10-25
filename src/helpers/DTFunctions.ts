@@ -303,6 +303,54 @@ class DTFunctions {
     return configsData;
   }
 
+  // A utility function to get the settings data with schema
+  async getSettingsData(
+    environment: string,
+    entitiesList: any,
+    headers: Headers,
+    schemaId: string,
+    scope: string
+  ): Promise<any[]> {
+    let settings_list: any[] = [];
+    if (schemaId === "") {
+      return [];
+    }
+
+    let generated_scope = "";
+    // if scope equals "entity", replace the dynamic entityID, if the scope is "environment" it will remain as is
+    if (scope === "entity") {
+      for (const entity of entitiesList.entities) {
+        const entityId = entity.entityId;
+        generated_scope = generated_scope + entityId + ",";
+      }
+    } else {
+      generated_scope = scope;
+    }
+
+    if (generated_scope == "") {
+      return [];
+    }
+
+    const parameters = "schemaIds=" + schemaId + "&scopes=" + generated_scope;
+    const request = new Request(environment + "/api/v2/settings/objects?" + parameters, {
+      method: "GET",
+      headers: headers,
+    });
+    let data = {};
+    try {
+      const response = await fetch(request);
+      if (response.ok) {
+        data = await response.json();
+        settings_list.push(data);
+      } else {
+        const errorDetails = await response.text();
+        console.error("Settings Data Error:", response.status, errorDetails);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    return settings_list;
+  }
 
   // A utility function to get the documents list
   async getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any> {
@@ -380,6 +428,21 @@ class DTFunctions {
     checkKeywordsExistence(inputValue: string, keywords: string[]): boolean {
       return keywords.every(keyword => inputValue.toLowerCase().includes(keyword.toLowerCase()));
     }
+
+    findIdInObject(object: any): string | null {
+      for (const property in object) {
+        if (object.hasOwnProperty(property)) {
+          if (typeof object[property] === "object") {
+            const id = this.findIdInObject(object[property]);
+            if (id) return id;
+          } else if (property === 'id' || property === 'entityId') {
+            return object[property];
+          }
+        }
+      }
+      return null;
+    }
+
 
 }
 
