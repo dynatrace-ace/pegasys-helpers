@@ -18,10 +18,10 @@ declare class DTFunctions {
         finalScore: number;
         auditInfo: any;
     }>;
-    performGradingGen2(oauth_client_id: string, oauth_client_secret: string, dt_account_urn: string, oauth_sso_endpoint: string, dt_platform_environment: string, documentType: string, documentName: string, validationId: string, maxScore: number, getScore: (auditInfo: any) => Promise<{
+    performGradingGen2(dt_gen2_environment: string, dt_access_token: string, validationId: string, maxScore: number, getScore: (auditInfo: any) => Promise<{
         score: number;
         assertion_fails: any[];
-    }>): Promise<{
+    }>, entity_type: string, entity_name_to_query: string, config_endpoint: string, config_name_to_query: string, config_endpoint_extra_param: string, settings_schema_id: string, settings_scope: string): Promise<{
         validationId: string;
         maxScore: number;
         finalScore: number;

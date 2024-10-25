@@ -54,34 +54,50 @@ class DTFunctions {
     };
   }
 
+  
   async performGradingGen2(
-    oauth_client_id: string,
-    oauth_client_secret: string,
-    dt_account_urn: string,
-    oauth_sso_endpoint: string,
-    dt_platform_environment: string,
-    documentType: string,
-    documentName: string,
+    dt_gen2_environment: string,
+    dt_access_token: string,
     validationId: string,
     maxScore: number,
-    getScore: (auditInfo: any) => Promise<{ score: number, assertion_fails: any[] }>
+    getScore: (auditInfo: any) => Promise<{ score: number, assertion_fails: any[] }>,
+    entity_type: string,
+    entity_name_to_query: string,
+    config_endpoint: string,
+    config_name_to_query: string,
+    config_endpoint_extra_param: string,
+    settings_schema_id: string,
+    settings_scope: string
   ): Promise<{ validationId: string, maxScore: number, finalScore: number, auditInfo: any }> {
     // Get the authorization header
-    let oauth_header = null;
-    const dt_access_token = await this.getOauthAccessToken(oauth_client_id, oauth_client_secret, dt_account_urn, oauth_sso_endpoint);
-    if (!dt_access_token) {
-      throw new Error("Failed to obtain access token");
-    }
-    oauth_header = await this.getAuthorizationHeaderGen2(dt_access_token);
+    const auth_header = await this.getAuthorizationHeaderGen2(dt_access_token);
+  
+    // Get the entities list
+    const entitiesList = await this.getEntities(dt_gen2_environment, entity_type, entity_name_to_query, auth_header);
+  
+    // Get the entities data
+    const entitiesData = await this.getEntitiesData(dt_gen2_environment, entitiesList, auth_header);
+  
+    // Get API v1 config data
+    const configList = await this.getConfigsList(dt_gen2_environment, config_endpoint, config_name_to_query, config_endpoint_extra_param, entitiesList, auth_header);
+  
+    const configDetails = await this.getConfigsData(dt_gen2_environment, config_endpoint, configList, auth_header);
 
-    // Get documents list
-    const documentsList = await this.getDocumentsList(dt_platform_environment, documentType, documentName, oauth_header);
-
-    // Get document details
-    const documentDetails = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
-
-    // Generate Audit Info
-    const auditInfo = await this.generateAuditInfo({ documentList: documentsList, documentDetails: documentDetails });
+    // Get the settings data
+    const settingsData = await this.getSettingsData(dt_gen2_environment, entitiesList, auth_header, settings_schema_id, settings_scope);
+  
+    // Get the problems data
+    const problemsData = await this.getProblemsData(dt_gen2_environment, entitiesList, auth_header);
+  
+      // Generate Audit Info
+    const auditInfo = await this.generateAuditInfo({
+      entitiesList: entitiesList,
+      entitiesData: entitiesData,
+      settingsData: settingsData,
+      configList: configList,
+      configDetails: configDetails,
+      problemsData: problemsData
+    });
 
     // Get the score
     const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo);
@@ -93,7 +109,7 @@ class DTFunctions {
       finalScore: finalScore,
       auditInfo: auditInfo
     };
-  }
+}
 
   // A utility function to get the OAuth access token
   async getOauthAccessToken(
