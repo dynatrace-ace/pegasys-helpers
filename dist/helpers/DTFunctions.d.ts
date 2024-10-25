@@ -1,3 +1,13 @@
+interface AuditInfoParams {
+    documentList?: any;
+    documentDetails?: any;
+    entitiesList?: any;
+    entitiesData?: any;
+    settingsData?: any;
+    configList?: any;
+    configDetails?: any;
+    problemsData?: any;
+}
 declare class DTFunctions {
     performGradingPlatform(oauth_client_id: string, oauth_client_secret: string, dt_account_urn: string, oauth_sso_endpoint: string, dt_platform_environment: string, documentType: string, documentName: string, validationId: string, maxScore: number, getScore: (auditInfo: any) => Promise<{
         score: number;
@@ -29,7 +39,7 @@ declare class DTFunctions {
     getProblemsData(environment: string, entitiesList: any, headers: Headers): Promise<any>;
     getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any>;
     getDocumentDetails(environment: string, documentsList: any, headers: Headers): Promise<any[]>;
-    generateAuditInfo(documentList: any, documentDetails: any): Promise<any>;
+    generateAuditInfo({ documentList, documentDetails, entitiesList, entitiesData, settingsData, configList, configDetails, problemsData }: AuditInfoParams): Promise<any>;
     checkKeywordsExistence(inputValue: string, keywords: string[]): boolean;
     findIdInObject(object: any): string | null;
 }

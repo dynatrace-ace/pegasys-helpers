@@ -1,3 +1,14 @@
+interface AuditInfoParams {
+  documentList?: any;
+  documentDetails?: any;
+  entitiesList?: any;
+  entitiesData?: any;
+  settingsData?: any;
+  configList?: any;
+  configDetails?: any;
+  problemsData?: any;
+}
+
 class DTFunctions {
 
 
@@ -29,7 +40,7 @@ class DTFunctions {
     const documentDetails = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
 
     // Generate Audit Info
-    const auditInfo = await this.generateAuditInfo(documentsList, documentDetails);
+    const auditInfo = await this.generateAuditInfo({ documentList: documentsList, documentDetails: documentDetails });
 
     // Get the score
     const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo);
@@ -70,7 +81,7 @@ class DTFunctions {
     const documentDetails = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
 
     // Generate Audit Info
-    const auditInfo = await this.generateAuditInfo(documentsList, documentDetails);
+    const auditInfo = await this.generateAuditInfo({ documentList: documentsList, documentDetails: documentDetails });
 
     // Get the score
     const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo);
@@ -450,19 +461,51 @@ async getProblemsData(
       return documentDetails;
     }
 
-   // A utility function to generate audit info
-  async generateAuditInfo(documentList: any, documentDetails: any): Promise<any> {
-    let audit_info: any = {};
-
-    if (documentList != null) {
-      audit_info["documentList"] = documentList;
-    }
-
-    if (documentDetails != null) {
-      audit_info["documentDetails"] = documentDetails;
-    }
-
-    audit_info.assertionFails = [];
+    async generateAuditInfo({
+      documentList,
+      documentDetails,
+      entitiesList,
+      entitiesData,
+      settingsData,
+      configList,
+      configDetails,
+      problemsData
+    }: AuditInfoParams): Promise<any> {
+      let audit_info: any = {};
+    
+      if (documentList != null) {
+        audit_info["documentList"] = documentList;
+      }
+    
+      if (documentDetails != null) {
+        audit_info["documentDetails"] = documentDetails;
+      }
+    
+      if (entitiesList != null) {
+        audit_info["entitiesList"] = entitiesList;
+      }
+    
+      if (entitiesData != null) {
+        audit_info["entitiesData"] = entitiesData;
+      }
+    
+      if (configList != null) {
+        audit_info["configList"] = configList;
+      }
+    
+      if (configDetails != null && configDetails.error == null) {
+        audit_info["configDetails"] = configDetails;
+      }
+    
+      if (settingsData != null) {
+        audit_info["settingsData"] = settingsData;
+      }
+    
+      if (problemsData != null) {
+        audit_info["problemsData"] = problemsData;
+      }
+    
+      audit_info.assertionFails = [];
 
     return audit_info;
   }   
