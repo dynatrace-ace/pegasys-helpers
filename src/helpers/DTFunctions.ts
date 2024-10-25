@@ -260,6 +260,50 @@ class DTFunctions {
     return configlist;
   }
   
+  async getConfigsData(
+    environment: string,
+    config_endpoint: string,
+    configList: any,
+    headers: Headers
+  ): Promise<any[]> {
+    if (configList === null) {
+      return [];
+    }
+
+    let configsData: any[] = [];
+    for (const item of configList) {
+      for (const key in item) {
+        if (key && key != null && Array.isArray(item[key])) {
+          for (const subItem of item[key]) {
+            const id = subItem ? subItem.entityId || subItem.id : null;
+            if (id) {
+              const request_details: RequestInfo = new Request(environment + config_endpoint + "/" + id, {
+                method: 'GET',
+                headers: headers,
+              });
+
+              try {
+                const response_details = await fetch(request_details);
+                if (response_details.ok) {
+                  const configdetails = await response_details.json();
+                  configsData.push(configdetails);
+                } else {
+                  const errorDetails = await response_details.text();
+                  console.error("Config Data Error:", response_details.status, errorDetails);
+                }
+              } catch (error) {
+                console.error(error);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return configsData;
+  }
+
+
   // A utility function to get the documents list
   async getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any> {
     const documentFilter = `name contains '${document_name_to_query}' and type == '${document_type}'`;
