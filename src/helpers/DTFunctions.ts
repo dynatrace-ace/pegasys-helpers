@@ -352,6 +352,49 @@ class DTFunctions {
     return settings_list;
   }
 
+// A utility function to find the Problems
+async getProblemsData(
+  environment: string,
+  entitiesList: any,
+  headers: Headers
+): Promise<any> {
+  if (!entitiesList || !entitiesList.entities || entitiesList.entities.length <= 0) {
+    return null;
+  }
+
+  let rootCauseEntities = "";
+  for (const entity of entitiesList.entities) {
+    const entityId = entity.entityId;
+    rootCauseEntities += "," + entityId;
+  }
+  // Remove the leading comma
+  rootCauseEntities = rootCauseEntities.substring(1);
+
+  // Create the request object
+  const request = new Request(
+    `${environment}/api/v2/problems?from=now-6h&problemSelector=rootCauseEntity(${rootCauseEntities})`,
+    {
+      method: "GET",
+      headers: headers,
+    }
+  );
+
+  let data = null;
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      data = await response.json();
+    } else {
+      const errorDetails = await response.text();
+      console.error("Problems Data Error:", response.status, errorDetails);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  return data;
+}
+
   // A utility function to get the documents list
   async getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any> {
     const documentFilter = `name contains '${document_name_to_query}' and type == '${document_type}'`;

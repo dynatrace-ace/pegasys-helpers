@@ -26,6 +26,7 @@ declare class DTFunctions {
     callConfigList(environment: string, config_endpoint: string, config_name_to_query: string, parameters: string, headers: Headers): Promise<any>;
     getConfigsData(environment: string, config_endpoint: string, configList: any, headers: Headers): Promise<any[]>;
     getSettingsData(environment: string, entitiesList: any, headers: Headers, schemaId: string, scope: string): Promise<any[]>;
+    getProblemsData(environment: string, entitiesList: any, headers: Headers): Promise<any>;
     getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any>;
     getDocumentDetails(environment: string, documentsList: any, headers: Headers): Promise<any[]>;
     generateAuditInfo(documentList: any, documentDetails: any): Promise<any>;
