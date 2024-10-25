@@ -2,7 +2,7 @@ class DTFunctions {
 
 
    // A boilerplate function to perform a series of operations
-   async performOperations(
+   async performGradingPlatform(
     oauth_client_id: string,
     oauth_client_secret: string,
     dt_account_urn: string,
@@ -20,7 +20,48 @@ class DTFunctions {
     if (!dt_access_token) {
       throw new Error("Failed to obtain access token");
     }
-    oauth_header = await this.getAuthorizationHeader(dt_access_token);
+    oauth_header = await this.getAuthorizationHeaderPlatform(dt_access_token);
+
+    // Get documents list
+    const documentsList = await this.getDocumentsList(dt_platform_environment, documentType, documentName, oauth_header);
+
+    // Get document details
+    const documentDetails = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
+
+    // Generate Audit Info
+    const auditInfo = await this.generateAuditInfo(documentsList, documentDetails);
+
+    // Get the score
+    const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo);
+    auditInfo.assertionFails = assertionFails;
+
+    return {
+      validationId: validationId,
+      maxScore: maxScore,
+      finalScore: finalScore,
+      auditInfo: auditInfo
+    };
+  }
+
+  async performGradingGen2(
+    oauth_client_id: string,
+    oauth_client_secret: string,
+    dt_account_urn: string,
+    oauth_sso_endpoint: string,
+    dt_platform_environment: string,
+    documentType: string,
+    documentName: string,
+    validationId: string,
+    maxScore: number,
+    getScore: (auditInfo: any) => Promise<{ score: number, assertion_fails: any[] }>
+  ): Promise<{ validationId: string, maxScore: number, finalScore: number, auditInfo: any }> {
+    // Get the authorization header
+    let oauth_header = null;
+    const dt_access_token = await this.getOauthAccessToken(oauth_client_id, oauth_client_secret, dt_account_urn, oauth_sso_endpoint);
+    if (!dt_access_token) {
+      throw new Error("Failed to obtain access token");
+    }
+    oauth_header = await this.getAuthorizationHeaderGen2(dt_access_token);
 
     // Get documents list
     const documentsList = await this.getDocumentsList(dt_platform_environment, documentType, documentName, oauth_header);
@@ -83,7 +124,7 @@ class DTFunctions {
   }
 
   // A utility function to get the authorization header
-    async getAuthorizationHeader(token: string): Promise<Headers> {
+    async getAuthorizationHeaderPlatform(token: string): Promise<Headers> {
       // Create the headers object
       const headers = new Headers();
       // Add the authorization header
@@ -91,6 +132,15 @@ class DTFunctions {
       return headers;
     }
   
+    // A utility function to get the authorization header
+    async  getAuthorizationHeaderGen2(token: string): Promise<Headers> {
+      // Create the headers object
+      const headers = new Headers();
+      // Add the authorization header
+      headers.append("Authorization", "Api-Token " + token);
+      return headers;
+    }
+
     // A utility function to get the entities list
     async getEntities(environment: string, entity_type: string, entity_name_to_query: string, headers: Headers): Promise<any> {
       // Get the application with the specified name
@@ -148,6 +198,68 @@ class DTFunctions {
       return entitiesData;
     }
 
+
+  // A utility function to get the configs list
+  async getConfigsList(
+    environment: string,
+    config_endpoint: string,
+    config_name_to_query: string,
+    config_endpoint_extra_param: string,
+    entitiesList: any,
+    headers: Headers
+  ): Promise<any[]> {
+    let config_list: any[] = [];
+    if (config_endpoint === "" || !entitiesList) {
+      return [];
+    }
+    let parameters = "";
+    if (config_endpoint_extra_param.includes("/")) {
+      for (const entity of entitiesList.entities) {
+        const entityId = entity.entityId;
+        parameters = "/" + entityId + config_endpoint_extra_param;
+        let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
+        config_list.push(result);
+      }
+    } else if (config_endpoint_extra_param.includes("?")) {
+      parameters = config_endpoint_extra_param;
+      let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
+      config_list.push(result);
+    } else {
+      let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
+      config_list.push(result);
+    }
+
+    return config_list;
+  }
+
+  // A utility function to call the config list
+  async callConfigList(
+    environment: string,
+    config_endpoint: string,
+    config_name_to_query: string,
+    parameters: string,
+    headers: Headers
+  ): Promise<any> {
+    const request = new Request(environment + config_endpoint + parameters, {
+      method: "GET",
+      headers: headers,
+    });
+
+    let configlist = [];
+    try {
+      const response = await fetch(request);
+      if (response.ok) {
+        configlist = await response.json();
+      } else {
+        const errorDetails = await response.text();
+        console.error("ConfigList Error:", response.status, errorDetails);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    return configlist;
+  }
+  
   // A utility function to get the documents list
   async getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any> {
     const documentFilter = `name contains '${document_name_to_query}' and type == '${document_type}'`;
