@@ -34,7 +34,6 @@ class DTFunctions {
     // Get the score
     const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo);
     auditInfo.assertionFails = assertionFails;
-    console.log("auditInfo assertion fails:\n" + JSON.stringify(auditInfo.assertionFails, null, 2));
 
     return {
       validationId: validationId,
