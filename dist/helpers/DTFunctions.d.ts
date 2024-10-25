@@ -8,7 +8,7 @@ interface PlatformParams {
     documentName: string;
     validationId: string;
     maxScore: number;
-    getScore: (auditInfo: any) => Promise<{
+    getScore: (auditInfo: any, headers: Headers) => Promise<{
         score: number;
         assertion_fails: any[];
     }>;
@@ -25,7 +25,7 @@ interface Gen2Params {
     config_endpoint_extra_param: string;
     settings_schema_id: string;
     settings_scope: string;
-    getScore: (auditInfo: any) => Promise<{
+    getScore: (auditInfo: any, headers: Headers) => Promise<{
         score: number;
         assertion_fails: any[];
     }>;

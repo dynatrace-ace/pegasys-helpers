@@ -9,7 +9,7 @@ interface PlatformParams {
   documentName: string;
   validationId: string;
   maxScore: number;
-  getScore: (auditInfo: any) => Promise<{ score: number, assertion_fails: any[] }>;
+  getScore: (auditInfo: any, headers: Headers) => Promise<{ score: number, assertion_fails: any[] }>;
 }
 
 interface Gen2Params {
@@ -24,7 +24,7 @@ interface Gen2Params {
   config_endpoint_extra_param: string;
   settings_schema_id: string;
   settings_scope: string;
-  getScore: (auditInfo: any) => Promise<{ score: number, assertion_fails: any[] }>;
+  getScore: (auditInfo: any,headers: Headers) => Promise<{ score: number, assertion_fails: any[] }>;
 }
 
 
@@ -73,7 +73,7 @@ class DTFunctions {
     const auditInfo = await this.generateAuditInfo({ documentList: documentsList, documentDetails: documentDetails });
 
     // Get the score
-    const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo);
+    const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo, oauth_header);
     auditInfo.assertionFails = assertionFails;
 
     return {
@@ -130,7 +130,7 @@ class DTFunctions {
     });
 
     // Get the score
-    const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo);
+    const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo,auth_header);
     auditInfo.assertionFails = assertionFails;
 
     return {
