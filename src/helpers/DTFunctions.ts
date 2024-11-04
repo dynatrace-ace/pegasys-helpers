@@ -1,3 +1,12 @@
+enum LOG_LEVELS {
+  NONE = 0,
+  ERROR = 1,
+  WARN = 2,
+  INFO = 3,
+  DEBUG = 4
+}
+
+let currentLogLevel: LOG_LEVELS = LOG_LEVELS.ERROR; // Set the desired log level here
 
 interface PlatformParams {
   oauth_client_id: string;
@@ -155,7 +164,7 @@ class DTFunctions {
     urlencoded.append("grant_type", "client_credentials");
     urlencoded.append("client_id", oauth_client_id);
     urlencoded.append("client_secret", oauth_client_secret);
-    urlencoded.append("scope", "document:documents:read document:documents:write document:environment-shares:read document:direct-shares:read ");
+    urlencoded.append("scope", "document:documents:admin document:documents:read document:documents:write document:environment-shares:read document:direct-shares:read ");
     urlencoded.append("resource", dt_account_urn);
 
     const requestOptions: RequestInit = {
@@ -167,16 +176,26 @@ class DTFunctions {
 
     try {
       const response = await fetch(oauth_sso_endpoint, requestOptions);
+  
+      if (!response.ok) {
+        // Check if the response status is 400
+        if (response.status === 400) {
+          const errorDetails = await response.text();
+          console.error("oAuth Access Token Error:", response.status, errorDetails);
+          throw new Error(`Bad Request: ${errorDetails}`);
+        } else {
+          // Handle other non-OK responses
+          const errorDetails = await response.text();
+          console.error("oAuth Access Token Error:", response.status, errorDetails);
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      }
+  
       const result = await response.json();
+      this.log(LOG_LEVELS.INFO, "result:\n" + JSON.stringify(result, null, 2));
       return result.access_token;
     } catch (error: any) {
-      let errorDetails;
-      if (error.response) {
-        errorDetails = await error.response.text();
-        console.error("oAuth Access Token Error:", error.response.status, errorDetails);
-      } else {
-        console.error("oAuth Access Token Error:", error.message);
-      }
+      console.error("oAuth Access Token Error:", error.message);
     }
   }
 
@@ -453,16 +472,25 @@ async getProblemsData(
 }
 
   // A utility function to get the documents list
-  async getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any> {
+  async getDocumentsList(
+    environment: string,
+    document_type: string,
+    document_name_to_query: string,
+    headers: Headers
+  ): Promise<any> {
     const documentFilter = `name contains '${document_name_to_query}' and type == '${document_type}'`;
-    const request = new Request(`${environment}/platform/document/v1/documents?filter=${encodeURIComponent(documentFilter)}`, {
+    const request = new Request(`${environment}/platform/document/v1/documents?admin-access=true&filter=${encodeURIComponent(documentFilter)}`, {
       method: "GET",
       headers: headers,
     });
-
+  
+    this.log(LOG_LEVELS.INFO, "documentFilter:\n" + JSON.stringify(documentFilter, null, 2));
+  
     let documents = null;
     try {
+      this.log(LOG_LEVELS.INFO, "headers:\n" + JSON.stringify(headers, null, 2));
       const response = await fetch(request);
+      this.log(LOG_LEVELS.INFO, "response:\n" + JSON.stringify(response, null, 2));
       if (response.ok) {
         documents = await response.json();
       } else {
@@ -472,26 +500,30 @@ async getProblemsData(
     } catch (error) {
       console.error(error);
     }
-
+  
     return documents;
-  }    
+  }   
 
     // A utility function to get the document details
-    async getDocumentDetails(environment: string, documentsList: any, headers: Headers): Promise<any[]> {
+    async getDocumentDetails(
+      environment: string,
+      documentsList: any,
+      headers: Headers
+    ): Promise<any[]> {
       if (documentsList === null) {
         return [];
       }
-  
+    
       let documentDetails: any[] = [];
       const requestOptions: RequestInit = {
         method: "GET",
         headers: headers,
       };
-  
+    
       for (const document of documentsList.documents) {
         const documentId = String(document.id);
         try {
-          const response = await fetch(`${environment}/platform/document/v1/documents/${documentId}/content`, requestOptions);
+          const response = await fetch(`${environment}/platform/document/v1/documents/${documentId}/content?admin-access=true`, requestOptions);
           if (response.ok) {
             const result = await response.json();
             documentDetails.push(result);
@@ -503,7 +535,7 @@ async getProblemsData(
           console.error(error);
         }
       }
-  
+    
       return documentDetails;
     }
 
@@ -575,6 +607,11 @@ async getProblemsData(
       return null;
     }
 
+    log(level: LOG_LEVELS, message: string): void {
+      if (level <= currentLogLevel) {
+        console.log(message);
+      }
+    }
 
 }
 
