@@ -189,12 +189,12 @@ class DTFunctions {
         // Check if the response status is 400
         if (response.status === 400) {
           const errorDetails = await response.text();
-          console.error("oAuth Access Token Error:", response.status, errorDetails);
+          this.log(LOG_LEVELS.ERROR, `oAuth Access Token Error: ${response.status} ${errorDetails}`);
           throw new Error(`Bad Request: ${errorDetails}`);
         } else {
           // Handle other non-OK responses
           const errorDetails = await response.text();
-          console.error("oAuth Access Token Error:", response.status, errorDetails);
+          this.log(LOG_LEVELS.ERROR, `oAuth Access Token Error: ${response.status} ${errorDetails}`);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
       }
@@ -203,7 +203,7 @@ class DTFunctions {
       this.log(LOG_LEVELS.INFO, "result:\n" + JSON.stringify(result, null, 2));
       return result.access_token;
     } catch (error: any) {
-      console.error("oAuth Access Token Error:", error.message);
+      this.log(LOG_LEVELS.ERROR, `oAuth Access Token Error: ${error.message}`);
     }
   }
 
@@ -242,10 +242,10 @@ class DTFunctions {
           entities = await response.json();
         } else {
           const errorDetails = await response.text();
-          console.error("Entity ID Error:", response.status, errorDetails);
+          this.log(LOG_LEVELS.ERROR, `"Entity ID Error: ${response.status} ${errorDetails}`);
         }
       } catch (error) {
-        console.error(error);
+        this.log(LOG_LEVELS.ERROR, ` ${error}`);
       }
   
       return entities;
@@ -272,10 +272,10 @@ class DTFunctions {
             entitiesData.push(data);
           } else {
             const errorDetails = await response.text();
-            console.error("Entity Details Error:", response.status, errorDetails);
+            this.log(LOG_LEVELS.ERROR, `Entity Details Error: ${response.status} ${errorDetails}`);
           }
         } catch (error) {
-          console.error(error);
+          this.log(LOG_LEVELS.ERROR, ` ${error}`);
         }
       }
   
@@ -336,10 +336,10 @@ class DTFunctions {
         configlist = await response.json();
       } else {
         const errorDetails = await response.text();
-        console.error("ConfigList Error:", response.status, errorDetails);
+        this.log(LOG_LEVELS.ERROR, `ConfigList Error: ${response.status} ${errorDetails}`);
       }
     } catch (error) {
-      console.error(error);
+      this.log(LOG_LEVELS.ERROR, `${error}`);      
     }
     return configlist;
   }
@@ -373,10 +373,10 @@ class DTFunctions {
                   configsData.push(configdetails);
                 } else {
                   const errorDetails = await response_details.text();
-                  console.error("Config Data Error:", response_details.status, errorDetails);
+                  this.log(LOG_LEVELS.ERROR, `Config Data Error: ${response_details.status} ${errorDetails}`);
                 }
               } catch (error) {
-                console.error(error);
+                this.log(LOG_LEVELS.ERROR, `${error}`);    
               }
             }
           }
@@ -428,10 +428,10 @@ class DTFunctions {
         settings_list.push(data);
       } else {
         const errorDetails = await response.text();
-        console.error("Settings Data Error:", response.status, errorDetails);
+        this.log(LOG_LEVELS.ERROR, `Settings Data Error: ${response.status} ${errorDetails}`);
       }
     } catch (error) {
-      console.error(error);
+      this.log(LOG_LEVELS.ERROR, `${error}`);    
     }
     return settings_list;
   }
@@ -470,10 +470,10 @@ async getProblemsData(
       data = await response.json();
     } else {
       const errorDetails = await response.text();
-      console.error("Problems Data Error:", response.status, errorDetails);
+      this.log(LOG_LEVELS.ERROR, `Problems Data Error: ${response.status} ${errorDetails}`);
     }
   } catch (error) {
-    console.error(error);
+    this.log(LOG_LEVELS.ERROR, `${error}`);    
   }
 
   return data;
@@ -503,10 +503,10 @@ async getProblemsData(
         documents = await response.json();
       } else {
         const errorDetails = await response.text();
-        console.error("Document List Error:", response.status, errorDetails);
+        this.log(LOG_LEVELS.ERROR, `Document List Error: ${response.status} ${errorDetails}`);
       }
     } catch (error) {
-      console.error(error);
+      this.log(LOG_LEVELS.ERROR, `${error}`);    
     }
   
     return documents;
@@ -537,10 +537,10 @@ async getProblemsData(
             documentDetails.push(result);
           } else {
             const errorDetails = await response.text();
-            console.error("Document Details Error:", response.status, errorDetails);
+            this.log(LOG_LEVELS.ERROR, `Document Details Error: ${response.status} ${errorDetails}`);
           }
         } catch (error) {
-          console.error(error);
+          this.log(LOG_LEVELS.ERROR, `${error}`);    
         }
       }
     
