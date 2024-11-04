@@ -298,6 +298,7 @@ class DTFunctions {
     headers: Headers
   ): Promise<any[]> {
     let dashboard_list: any[] = [];
+    let user_dashboard_list: any[] = [];
     const config_endpoint = "/api/config/v1/dashboards";
     const config_endpoint_extra_param = "";
     
@@ -312,13 +313,17 @@ class DTFunctions {
       );
       this.log(LOG_LEVELS.DEBUG, "dashboard_list raw:\n" + JSON.stringify(dashboard_list, null, 2));
       // Filter the dashboards based on the owner field
-      dashboard_list = dashboard_list.filter((dashboard: any) => dashboard.owner !== "Dynatrace");
-      this.log(LOG_LEVELS.DEBUG, "dashboard_list:\n" + JSON.stringify(dashboard_list, null, 2));
+      let dashboards = dashboard_list.filter((dashboard: any) => dashboard.owner !== "Dynatrace");
+    
+      if (dashboards.length > 0) {
+        user_dashboard_list.push({dashboards: dashboards});
+      }
+      this.log(LOG_LEVELS.DEBUG, "user_dashboard_list:\n" + JSON.stringify(user_dashboard_list, null, 2));
     } catch (error) {
       this.log(LOG_LEVELS.ERROR, `getUserDashboardList Error: ${error}`);
     }
 
-    return dashboard_list;
+    return user_dashboard_list;
   }
 
 
