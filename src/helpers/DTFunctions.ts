@@ -310,10 +310,10 @@ class DTFunctions {
         null,
         headers
       );
-      this.log(LOG_LEVELS.INFO, "dashboard_list raw:\n" + JSON.stringify(dashboard_list, null, 2));
+      this.log(LOG_LEVELS.DEBUG, "dashboard_list raw:\n" + JSON.stringify(dashboard_list, null, 2));
       // Filter the dashboards based on the owner field
       dashboard_list = dashboard_list.filter((dashboard: any) => dashboard.owner !== "Dynatrace");
-      this.log(LOG_LEVELS.INFO, "dashboard_list:\n" + JSON.stringify(dashboard_list, null, 2));
+      this.log(LOG_LEVELS.DEBUG, "dashboard_list:\n" + JSON.stringify(dashboard_list, null, 2));
     } catch (error) {
       this.log(LOG_LEVELS.ERROR, `getUserDashboardList Error: ${error}`);
     }
@@ -341,7 +341,7 @@ class DTFunctions {
         dashboardList,
         headers
       );
-      this.log(LOG_LEVELS.INFO, "dashboardsData:\n" + JSON.stringify(dashboardsData, null, 2));
+      this.log(LOG_LEVELS.DEBUG, "dashboardsData:\n" + JSON.stringify(dashboardsData, null, 2));
     } catch (error) {
       this.log(LOG_LEVELS.ERROR, `getDashboardsData Error: ${error}`);
     }
@@ -359,21 +359,23 @@ class DTFunctions {
     headers: Headers
   ): Promise<any[]> {
     let config_list: any[] = [];
-    if (config_endpoint === "" || !entitiesList) {
+    if (config_endpoint === "") {
       return [];
     }
     let parameters = "";
-    if (config_endpoint_extra_param.includes("/")) {
+    if (config_endpoint_extra_param.includes("/") && !entitiesList) {
       for (const entity of entitiesList.entities) {
         const entityId = entity.entityId;
         parameters = "/" + entityId + config_endpoint_extra_param;
         let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
         config_list.push(result);
       }
+      this.log(LOG_LEVELS.DEBUG, "Config List with extra param /");
     } else if (config_endpoint_extra_param.includes("?")) {
       parameters = config_endpoint_extra_param;
       let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
       config_list.push(result);
+      this.log(LOG_LEVELS.DEBUG, "Config List with extra param ?");
     } else {
       let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
       config_list.push(result);
