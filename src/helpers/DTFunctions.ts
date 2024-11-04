@@ -313,7 +313,7 @@ class DTFunctions {
       );
       this.log(LOG_LEVELS.DEBUG, "dashboard_list raw:\n" + JSON.stringify(dashboard_list, null, 2));
       // Filter the dashboards based on the owner field
-      let dashboards = dashboard_list.filter((dashboard: any) => dashboard.owner !== "Dynatrace");
+      let dashboards = dashboard_list[0].dashboards.filter((dashboard: any) => dashboard.owner !== "Dynatrace");
     
       if (dashboards.length > 0) {
         user_dashboard_list.push({dashboards: dashboards});
