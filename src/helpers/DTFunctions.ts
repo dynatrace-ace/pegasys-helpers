@@ -312,6 +312,7 @@ class DTFunctions {
       );
       // Filter the dashboards based on the owner field
       dashboard_list = dashboard_list.filter((dashboard: any) => dashboard.owner !== "Dynatrace");
+      this.log(LOG_LEVELS.INFO, "dashboard_list:\n" + JSON.stringify(dashboard_list, null, 2));
     } catch (error) {
       this.log(LOG_LEVELS.ERROR, `getUserDashboardList Error: ${error}`);
     }
@@ -339,6 +340,7 @@ class DTFunctions {
         dashboardList,
         headers
       );
+      this.log(LOG_LEVELS.INFO, "dashboardsData:\n" + JSON.stringify(dashboardsData, null, 2));
     } catch (error) {
       this.log(LOG_LEVELS.ERROR, `getDashboardsData Error: ${error}`);
     }
