@@ -46,6 +46,8 @@ interface AuditInfoParams {
   configList?: any;
   configDetails?: any;
   problemsData?: any;
+  userDashboardList?: any;
+  userDashboardDetails?: any;
 }
 
 class DTFunctions {
@@ -135,7 +137,12 @@ class DTFunctions {
   
     // Get the problems data
     const problemsData = await this.getProblemsData(dt_gen2_environment, entitiesList, auth_header);
-  
+ 
+    // Get Dashboard List
+    const userDashboardList = await this.getUserDashboardList(dt_gen2_environment, auth_header);
+    const userDashboardDetails = await this.getDashboardsData(dt_gen2_environment, userDashboardList, auth_header);
+
+
       // Generate Audit Info
     const auditInfo = await this.generateAuditInfo({
       entitiesList: entitiesList,
@@ -143,7 +150,9 @@ class DTFunctions {
       settingsData: settingsData,
       configList: configList,
       configDetails: configDetails,
-      problemsData: problemsData
+      problemsData: problemsData,
+      userDashboardList: userDashboardList,
+      userDashboardDetails: userDashboardDetails
     });
 
     // Get the score
@@ -282,6 +291,60 @@ class DTFunctions {
       return entitiesData;
     }
 
+
+  // A utility function to get the dashboard configs list
+  async getUserDashboardList(
+    environment: string,
+    headers: Headers
+  ): Promise<any[]> {
+    let dashboard_list: any[] = [];
+    const config_endpoint = "/api/config/v1/dashboards";
+    const config_endpoint_extra_param = "";
+    
+    try {
+      dashboard_list = await this.getConfigsList(
+        environment,
+        config_endpoint,
+        "", 
+        config_endpoint_extra_param,
+        null,
+        headers
+      );
+      // Filter the dashboards based on the owner field
+      dashboard_list = dashboard_list.filter((dashboard: any) => dashboard.owner !== "Dynatrace");
+    } catch (error) {
+      this.log(LOG_LEVELS.ERROR, `getUserDashboardList Error: ${error}`);
+    }
+
+    return dashboard_list;
+  }
+
+
+  async getDashboardsData(
+    environment: string,
+    dashboardList: any,
+    headers: Headers
+  ): Promise<any[]> {
+    if (dashboardList === null) {
+      return [];
+    }
+
+    let dashboardsData: any[] = [];
+    const config_endpoint = "/api/config/v1/dashboards";
+
+    try {
+      dashboardsData = await this.getConfigsData(
+        environment,
+        config_endpoint,
+        dashboardList,
+        headers
+      );
+    } catch (error) {
+      this.log(LOG_LEVELS.ERROR, `getDashboardsData Error: ${error}`);
+    }
+
+    return dashboardsData;
+  }
 
   // A utility function to get the configs list
   async getConfigsList(
@@ -555,7 +618,9 @@ async getProblemsData(
       settingsData,
       configList,
       configDetails,
-      problemsData
+      problemsData,
+      userDashboardList,
+      userDashboardDetails
     }: AuditInfoParams): Promise<any> {
       let audit_info: any = {};
     
@@ -589,6 +654,14 @@ async getProblemsData(
     
       if (problemsData != null) {
         audit_info["problemsData"] = problemsData;
+      }
+
+      if (userDashboardList != null) {
+        audit_info["userDashboardList"] = userDashboardList;
+      }
+
+      if (userDashboardDetails != null) {
+        audit_info["userDashboardDetails"] = userDashboardDetails;
       }
     
       audit_info.assertionFails = [];
