@@ -6,7 +6,7 @@ export enum LOG_LEVELS {
   DEBUG = 4
 }
 
-let currentLogLevel: LOG_LEVELS = LOG_LEVELS.ERROR; // Set the desired log level here
+//let currentLogLevel: LOG_LEVELS = LOG_LEVELS.ERROR; // Set the desired log level here
 
 interface PlatformParams {
   oauth_client_id: string;
@@ -50,7 +50,15 @@ interface AuditInfoParams {
 
 class DTFunctions {
 
+  private currentLogLevel: LOG_LEVELS;
 
+  constructor(currentLogLevel: LOG_LEVELS = LOG_LEVELS.ERROR) {
+    this.currentLogLevel = currentLogLevel;
+  }
+
+  setLogLevel(level: LOG_LEVELS): void {
+    this.currentLogLevel = level;
+  }
    // A boilerplate function to perform a series of operations
    async performGradingPlatform({
     oauth_client_id,
@@ -608,11 +616,11 @@ async getProblemsData(
     }
 
     log(level: LOG_LEVELS, message: string): void {
-      if (level <= currentLogLevel) {
+      if (level <= this.currentLogLevel) {
         console.log(message);
       }
     }
 
 }
 
-  export default DTFunctions;
+export default DTFunctions;

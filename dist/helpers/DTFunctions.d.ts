@@ -48,6 +48,9 @@ interface AuditInfoParams {
     problemsData?: any;
 }
 declare class DTFunctions {
+    private currentLogLevel;
+    constructor(currentLogLevel?: LOG_LEVELS);
+    setLogLevel(level: LOG_LEVELS): void;
     performGradingPlatform({ oauth_client_id, oauth_client_secret, dt_account_urn, oauth_sso_endpoint, dt_platform_environment, documentType, documentName, validationId, maxScore, getScore }: PlatformParams): Promise<{
         validationId: string;
         maxScore: number;
