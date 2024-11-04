@@ -1,3 +1,10 @@
+declare enum LOG_LEVELS {
+    NONE = 0,
+    ERROR = 1,
+    WARN = 2,
+    INFO = 3,
+    DEBUG = 4
+}
 interface PlatformParams {
     oauth_client_id: string;
     oauth_client_secret: string;
@@ -68,5 +75,6 @@ declare class DTFunctions {
     generateAuditInfo({ documentList, documentDetails, entitiesList, entitiesData, settingsData, configList, configDetails, problemsData }: AuditInfoParams): Promise<any>;
     checkKeywordsExistence(inputValue: string, keywords: string[]): boolean;
     findIdInObject(object: any): string | null;
+    log(level: LOG_LEVELS, message: string): void;
 }
 export default DTFunctions;
