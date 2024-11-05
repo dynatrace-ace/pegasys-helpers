@@ -638,6 +638,7 @@ async getProblemsData(
             // Remove the 'result' attribute from the document detail
             if (result.sections) {
               result.sections.forEach((section: any) => {
+                this.log(LOG_LEVELS.DEBUG, "section.state.davis:\n" + JSON.stringify(section.state.davis, null, 2));
                 if (section.state && section.state.result) {
                   delete section.state.result;
                 }
