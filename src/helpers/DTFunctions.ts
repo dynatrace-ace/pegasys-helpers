@@ -634,6 +634,11 @@ async getProblemsData(
               const errorDetails = await environmentSharesResponse.text();
               this.log(LOG_LEVELS.ERROR, `Environment Shares Error: ${environmentSharesResponse.status} ${errorDetails}`);
             }
+            
+            // Remove the 'result' attribute from the document detail
+            if (result.state && result.state.result) {
+              delete result.state.result;
+            }
 
             documentDetails.push(result);
           } else {
