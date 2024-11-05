@@ -209,7 +209,7 @@ class DTFunctions {
       }
   
       const result = await response.json();
-      this.log(LOG_LEVELS.INFO, "result:\n" + JSON.stringify(result, null, 2));
+      this.log(LOG_LEVELS.DEBUG, "oAuth Access Token result:\n" + JSON.stringify(result, null, 2));
       return result.access_token;
     } catch (error: any) {
       this.log(LOG_LEVELS.ERROR, `oAuth Access Token Error: ${error.message}`);
