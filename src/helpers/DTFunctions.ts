@@ -635,7 +635,18 @@ async getProblemsData(
               const errorDetails = await environmentSharesResponse.text();
               this.log(LOG_LEVELS.ERROR, `Environment Shares Error: ${environmentSharesResponse.status} ${errorDetails}`);
             }
-            
+
+            if (result.sections) {
+              result.sections.forEach((section: any) => {
+                if (section.state && section.state.result) {
+                  delete section.state.result;
+                }
+                if (section.state.davis && section.state.davis.resultState) {
+                  delete section.state.davis.resultState;
+                }
+              });
+            }
+
           // Create a copy of the result for audit info and remove the 'result' and 'resultState' attributes
           const auditResult = JSON.parse(JSON.stringify(result));
           if (auditResult.sections) {
