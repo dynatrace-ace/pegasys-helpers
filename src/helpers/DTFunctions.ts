@@ -559,7 +559,11 @@ async getProblemsData(
     document_name_to_query: string,
     headers: Headers
   ): Promise<any> {
-    const documentFilter = `name contains '${document_name_to_query}' and type == '${document_type}'`;
+
+    // Normalize the document_name_to_query by removing spaces and converting to lowercase
+    const normalizedDocumentName = document_name_to_query.replace(/\s+/g, '').toLowerCase();
+
+    const documentFilter = `name contains '${normalizedDocumentName}' and type == '${document_type}'`;
     const request = new Request(`${environment}/platform/document/v1/documents?admin-access=true&filter=${encodeURIComponent(documentFilter)}`, {
       method: "GET",
       headers: headers,
@@ -705,7 +709,13 @@ async getProblemsData(
 
 
     checkKeywordsExistence(inputValue: string, keywords: string[]): boolean {
-      return keywords.every(keyword => inputValue.toLowerCase().includes(keyword.toLowerCase()));
+      // Normalize the input by removing spaces and converting to lowercase
+      const normalizedInput = inputValue.replace(/\s+/g, '').toLowerCase();
+
+      // Normalize the keywords by removing spaces and converting to lowercase
+      const normalizedKeywords = keywords.map(keyword => keyword.replace(/\s+/g, '').toLowerCase());
+    
+      return normalizedKeywords.every(keyword => normalizedInput.includes(keyword));
     }
 
     findIdInObject(object: any): string | null {
