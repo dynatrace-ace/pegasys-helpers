@@ -565,13 +565,13 @@ async getProblemsData(
       headers: headers,
     });
   
-    this.log(LOG_LEVELS.INFO, "documentFilter:\n" + JSON.stringify(documentFilter, null, 2));
+    this.log(LOG_LEVELS.DEBUG, "documentFilter:\n" + JSON.stringify(documentFilter, null, 2));
   
     let documents = null;
     try {
-      this.log(LOG_LEVELS.INFO, "headers:\n" + JSON.stringify(headers, null, 2));
+      this.log(LOG_LEVELS.DEBUG, "headers:\n" + JSON.stringify(headers, null, 2));
       const response = await fetch(request);
-      this.log(LOG_LEVELS.INFO, "response:\n" + JSON.stringify(response, null, 2));
+      this.log(LOG_LEVELS.DEBUG, "response:\n" + JSON.stringify(response, null, 2));
       if (response.ok) {
         documents = await response.json();
       } else {
