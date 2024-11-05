@@ -40,6 +40,7 @@ interface Gen2Params {
 interface AuditInfoParams {
   documentList?: any;
   documentDetails?: any;
+  auditDocumentDetails?: any;
   entitiesList?: any;
   entitiesData?: any;
   settingsData?: any;
@@ -86,10 +87,10 @@ class DTFunctions {
     const documentsList = await this.getDocumentsList(dt_platform_environment, documentType, documentName, oauth_header);
 
     // Get document details
-    const documentDetails = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
+    const  { documentDetails, auditDocumentDetails } = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
 
     // Generate Audit Info
-    const auditInfo = await this.generateAuditInfo({ documentList: documentsList, documentDetails: documentDetails });
+    const auditInfo = await this.generateAuditInfo({ documentList: documentsList, auditDocumentDetails: auditDocumentDetails });
 
     // Get the score
     const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo, oauth_header);
@@ -594,12 +595,13 @@ async getProblemsData(
       environment: string,
       documentsList: any,
       headers: Headers
-    ): Promise<any[]> {
+    ): Promise<{ documentDetails: any[], auditDocumentDetails: any[] }> {
       if (documentsList === null) {
-        return [];
+        return { documentDetails: [], auditDocumentDetails: [] };
       }
     
       let documentDetails: any[] = [];
+      let auditDocumentDetails: any[] = [];
       const requestOptions: RequestInit = {
         method: "GET",
         headers: headers,
@@ -635,19 +637,19 @@ async getProblemsData(
               this.log(LOG_LEVELS.ERROR, `Environment Shares Error: ${environmentSharesResponse.status} ${errorDetails}`);
             }
             
-            // Remove the 'result' attribute from the document detail
-            if (result.sections) {
-              result.sections.forEach((section: any) => {
-                this.log(LOG_LEVELS.DEBUG, "section.state.davis:\n" + JSON.stringify(section.state.davis, null, 2));
-                if (section.state && section.state.result) {
-                  delete section.state.result;
-                }
-                if (section.state.davis && section.state.davis.resultState) {
-                  delete section.state.davis.resultState;
-                }
-              });
-            }
-
+          // Create a copy of the result for audit info and remove the 'result' and 'resultState' attributes
+          const auditResult = JSON.parse(JSON.stringify(result));
+          if (auditResult.sections) {
+            auditResult.sections.forEach((section: any) => {
+              if (section.state && section.state.result) {
+                delete section.state.result;
+              }
+              if (section.state.davis && section.state.davis.resultState) {
+                delete section.state.davis.resultState;
+              }
+            });
+          }
+            auditDocumentDetails.push(auditResult);
             documentDetails.push(result);
           } else {
             const errorDetails = await response.text();
@@ -658,12 +660,12 @@ async getProblemsData(
         }
       }
     
-      return documentDetails;
+      return { documentDetails, auditDocumentDetails };
     }
 
     async generateAuditInfo({
       documentList,
-      documentDetails,
+      auditDocumentDetails,
       entitiesList,
       entitiesData,
       settingsData,
@@ -679,8 +681,8 @@ async getProblemsData(
         audit_info["documentList"] = documentList;
       }
     
-      if (documentDetails != null) {
-        audit_info["documentDetails"] = documentDetails;
+      if (auditDocumentDetails != null) {
+        audit_info["auditDocumentDetails"] = auditDocumentDetails;
       }
     
       if (entitiesList != null) {
