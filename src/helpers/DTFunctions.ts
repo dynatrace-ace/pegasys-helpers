@@ -609,7 +609,8 @@ async getProblemsData(
             const result = await response.json();
 
             // Fetch direct-shares information
-            const directSharesResponse = await fetch(`${environment}/platform/document/v1/direct-shares?filter=documentId%3D%3D%27${documentId}`, requestOptions);
+            const documentSharesFilter = `documentId=='${documentId}'`;
+            const directSharesResponse = await fetch(`${environment}/platform/document/v1/direct-shares?filter=${encodeURIComponent(documentSharesFilter)}`, requestOptions);
             if (directSharesResponse.ok) {
               const directSharesResult = await directSharesResponse.json();
               this.log(LOG_LEVELS.DEBUG, "directSharesResult:\n" + JSON.stringify(directSharesResult, null, 2));
