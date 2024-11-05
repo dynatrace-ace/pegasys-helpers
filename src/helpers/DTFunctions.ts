@@ -40,7 +40,6 @@ interface Gen2Params {
 interface AuditInfoParams {
   documentList?: any;
   documentDetails?: any;
-  auditDocumentDetails?: any;
   entitiesList?: any;
   entitiesData?: any;
   settingsData?: any;
@@ -90,7 +89,7 @@ class DTFunctions {
     const  { documentDetails, auditDocumentDetails } = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
 
     // Generate Audit Info
-    const auditInfo = await this.generateAuditInfo({ documentList: documentsList, auditDocumentDetails: auditDocumentDetails });
+    const auditInfo = await this.generateAuditInfo({ documentList: documentsList, documentDetails: documentDetails });
 
     // Get the score
     const { score: finalScore, assertion_fails: assertionFails } = await getScore(auditInfo, oauth_header);
@@ -665,7 +664,7 @@ async getProblemsData(
 
     async generateAuditInfo({
       documentList,
-      auditDocumentDetails,
+      documentDetails,
       entitiesList,
       entitiesData,
       settingsData,
@@ -681,8 +680,8 @@ async getProblemsData(
         audit_info["documentList"] = documentList;
       }
     
-      if (auditDocumentDetails != null) {
-        audit_info["auditDocumentDetails"] = auditDocumentDetails;
+      if (documentDetails != null) {
+        audit_info["documentDetails"] = documentDetails;
       }
     
       if (entitiesList != null) {

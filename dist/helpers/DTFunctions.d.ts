@@ -40,7 +40,6 @@ interface Gen2Params {
 interface AuditInfoParams {
     documentList?: any;
     documentDetails?: any;
-    auditDocumentDetails?: any;
     entitiesList?: any;
     entitiesData?: any;
     settingsData?: any;
@@ -83,7 +82,7 @@ declare class DTFunctions {
         documentDetails: any[];
         auditDocumentDetails: any[];
     }>;
-    generateAuditInfo({ documentList, auditDocumentDetails, entitiesList, entitiesData, settingsData, configList, configDetails, problemsData, userDashboardList, userDashboardDetails }: AuditInfoParams): Promise<any>;
+    generateAuditInfo({ documentList, documentDetails, entitiesList, entitiesData, settingsData, configList, configDetails, problemsData, userDashboardList, userDashboardDetails }: AuditInfoParams): Promise<any>;
     checkKeywordsExistence(inputValue: string, keywords: string[]): boolean;
     findIdInObject(object: any): string | null;
     log(level: LOG_LEVELS, message: string): void;
