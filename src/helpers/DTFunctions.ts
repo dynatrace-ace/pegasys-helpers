@@ -641,6 +641,9 @@ async getProblemsData(
                 if (section.state && section.state.result) {
                   delete section.state.result;
                 }
+                if (section.state.davis && section.state.davis.resultState) {
+                  delete section.state.davis.resultState;
+                }
               });
             }
 
