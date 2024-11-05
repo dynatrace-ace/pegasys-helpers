@@ -636,8 +636,12 @@ async getProblemsData(
             }
             
             // Remove the 'result' attribute from the document detail
-            if (result.state && result.state.result) {
-              delete result.state.result;
+            if (result.sections) {
+              result.sections.forEach((section: any) => {
+                if (section.state && section.state.result) {
+                  delete section.state.result;
+                }
+              });
             }
 
             documentDetails.push(result);
