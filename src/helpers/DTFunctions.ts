@@ -311,14 +311,14 @@ class DTFunctions {
         null,
         headers
       );
-      this.log(LOG_LEVELS.DEBUG, "dashboard_list raw:\n" + JSON.stringify(dashboard_list, null, 2));
+      this.log(LOG_LEVELS.DEBUG, "dashboard_list raw:\n" + JSON.stringify(dashboard_list[0].dashboards, null, 2));
       // Filter the dashboards based on the owner field
       let dashboards = dashboard_list[0].dashboards.filter((dashboard: any) => dashboard.owner !== "Dynatrace");
     
       if (dashboards.length > 0) {
         user_dashboard_list.push({dashboards: dashboards});
       }
-      this.log(LOG_LEVELS.DEBUG, "user_dashboard_list:\n" + JSON.stringify(user_dashboard_list, null, 2));
+      this.log(LOG_LEVELS.DEBUG, "user_dashboard_list:\n" + JSON.stringify(user_dashboard_list[0].dashboards, null, 2));
     } catch (error) {
       this.log(LOG_LEVELS.ERROR, `getUserDashboardList Error: ${error}`);
     }
