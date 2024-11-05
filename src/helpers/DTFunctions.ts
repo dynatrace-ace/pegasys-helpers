@@ -607,6 +607,18 @@ async getProblemsData(
           const response = await fetch(`${environment}/platform/document/v1/documents/${documentId}/content?admin-access=true`, requestOptions);
           if (response.ok) {
             const result = await response.json();
+
+            // Fetch direct-shares information
+            const directSharesResponse = await fetch(`${environment}/platform/document/v1/direct-shares?filter=documentId%3D%3D%27${documentId}`, requestOptions);
+            if (directSharesResponse.ok) {
+              const directSharesResult = await directSharesResponse.json();
+              this.log(LOG_LEVELS.DEBUG, "directSharesResult:\n" + JSON.stringify(directSharesResult, null, 2));
+              result["direct-shares"] = directSharesResult["direct-shares"];
+            } else {
+              const errorDetails = await directSharesResponse.text();
+              this.log(LOG_LEVELS.ERROR, `Direct Shares Error: ${directSharesResponse.status} ${errorDetails}`);
+            }
+
             documentDetails.push(result);
           } else {
             const errorDetails = await response.text();
