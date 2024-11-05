@@ -620,6 +620,17 @@ async getProblemsData(
               this.log(LOG_LEVELS.ERROR, `Direct Shares Error: ${directSharesResponse.status} ${errorDetails}`);
             }
 
+            // Fetch environment-shares information
+            const environmentSharesResponse = await fetch(`${environment}/platform/document/v1/environment-shares?filter=${encodeURIComponent(documentSharesFilter)}`, requestOptions);
+            if (environmentSharesResponse.ok) {
+              const environmentSharesResult = await environmentSharesResponse.json();
+              this.log(LOG_LEVELS.DEBUG, "environmentSharesResult:\n" + JSON.stringify(environmentSharesResult, null, 2));
+              result["environment-shares"] = environmentSharesResult["environment-shares"];
+            } else {
+              const errorDetails = await environmentSharesResponse.text();
+              this.log(LOG_LEVELS.ERROR, `Environment Shares Error: ${environmentSharesResponse.status} ${errorDetails}`);
+            }
+
             documentDetails.push(result);
           } else {
             const errorDetails = await response.text();
