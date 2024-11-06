@@ -51,6 +51,7 @@ interface AuditInfoParams {
 }
 declare class DTFunctions {
     private currentLogLevel;
+    private jsonSizeThreshold;
     constructor(currentLogLevel?: LOG_LEVELS);
     setLogLevel(level: LOG_LEVELS): void;
     performGradingPlatform({ oauth_client_id, oauth_client_secret, dt_account_urn, oauth_sso_endpoint, dt_platform_environment, documentType, documentName, validationId, maxScore, getScore }: PlatformParams): Promise<{
@@ -80,7 +81,6 @@ declare class DTFunctions {
     getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any>;
     getDocumentDetails(environment: string, documentsList: any, headers: Headers): Promise<{
         documentDetails: any[];
-        auditDocumentDetails: any[];
     }>;
     generateAuditInfo({ documentList, documentDetails, entitiesList, entitiesData, settingsData, configList, configDetails, problemsData, userDashboardList, userDashboardDetails }: AuditInfoParams): Promise<any>;
     checkKeywordsExistence(inputValue: string, keywords: string[]): boolean;

@@ -51,8 +51,8 @@ interface AuditInfoParams {
 }
 
 class DTFunctions {
-
   private currentLogLevel: LOG_LEVELS;
+  private jsonSizeThreshold = 10000; // Set the size threshold in bytes
 
   constructor(currentLogLevel: LOG_LEVELS = LOG_LEVELS.ERROR) {
     this.currentLogLevel = currentLogLevel;
@@ -86,7 +86,7 @@ class DTFunctions {
     const documentsList = await this.getDocumentsList(dt_platform_environment, documentType, documentName, oauth_header);
 
     // Get document details
-    const  { documentDetails, auditDocumentDetails } = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
+    const  { documentDetails } = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
 
     // Generate Audit Info
     const auditInfo = await this.generateAuditInfo({ documentList: documentsList, documentDetails: documentDetails });
@@ -594,13 +594,12 @@ async getProblemsData(
       environment: string,
       documentsList: any,
       headers: Headers
-    ): Promise<{ documentDetails: any[], auditDocumentDetails: any[] }> {
+    ): Promise<{ documentDetails: any[] }> {
       if (documentsList === null) {
-        return { documentDetails: [], auditDocumentDetails: [] };
+        return { documentDetails: [] };
       }
     
       let documentDetails: any[] = [];
-      let auditDocumentDetails: any[] = [];
       const requestOptions: RequestInit = {
         method: "GET",
         headers: headers,
@@ -646,23 +645,7 @@ async getProblemsData(
                 }
               });
             }
-
-          // Create a copy of the result for audit info and remove the 'result' and 'resultState' attributes
-          const auditResult = JSON.parse(JSON.stringify(result));
-          if (auditResult.sections) {
-            auditResult.sections.forEach((section: any) => {
-              if (section.state && section.state.result) {
-                delete section.state.result;
-              }
-              if (section.state.davis && section.state.davis.resultState) {
-                delete section.state.davis.resultState;
-              }
-            });
-          }
-            this.log(LOG_LEVELS.DEBUG, "auditResult:" + JSON.stringify(auditResult, null, 2));
-            auditDocumentDetails.push(auditResult);
             documentDetails.push(result);
-            this.log(LOG_LEVELS.DEBUG, "auditDocumentDetails:" + JSON.stringify(auditDocumentDetails, null, 2));
           } else {
             const errorDetails = await response.text();
             this.log(LOG_LEVELS.ERROR, `Document Details Error: ${response.status} ${errorDetails}`);
@@ -672,7 +655,14 @@ async getProblemsData(
         }
       }
     
-      return { documentDetails, auditDocumentDetails };
+      // Check the size of the resulting JSON
+      const jsonString = JSON.stringify(documentDetails);
+      const jsonSize = new Blob([jsonString]).size;
+      if (jsonSize > this.jsonSizeThreshold) {
+        documentDetails.push({ warning: "The size of the JSON output is too large" });
+      }
+
+      return { documentDetails};
     }
 
     async generateAuditInfo({
