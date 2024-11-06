@@ -52,7 +52,7 @@ interface AuditInfoParams {
 
 class DTFunctions {
   private currentLogLevel: LOG_LEVELS;
-  private jsonSizeThreshold = 100000; // Set the size threshold in bytes
+  private jsonSizeThreshold = 50000; // Set the size threshold in bytes
 
   constructor(currentLogLevel: LOG_LEVELS = LOG_LEVELS.ERROR) {
     this.currentLogLevel = currentLogLevel;
