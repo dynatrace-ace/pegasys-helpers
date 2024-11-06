@@ -660,6 +660,7 @@ async getProblemsData(
       // Check the size of the resulting JSON
       const jsonString = JSON.stringify(documentDetails);
       const jsonSize = new Blob([jsonString]).size;
+      this.log(LOG_LEVELS.DEBUG, "jsonSize:" + jsonSize);
       if (jsonSize > this.jsonSizeThreshold) {
         documentDetails = [{ warning: "The size of the JSON output is too large" }];
       }
