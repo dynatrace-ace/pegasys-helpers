@@ -86,7 +86,7 @@ class DTFunctions {
     const documentsList = await this.getDocumentsList(dt_platform_environment, documentType, documentName, oauth_header);
 
     // Get document details
-    const  { documentDetails } = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
+    const documentDetails = await this.getDocumentDetails(dt_platform_environment, documentsList, oauth_header);
 
     // Generate Audit Info
     const auditInfo = await this.generateAuditInfo({ documentList: documentsList, documentDetails: documentDetails });
@@ -594,9 +594,9 @@ async getProblemsData(
       environment: string,
       documentsList: any,
       headers: Headers
-    ): Promise<{ documentDetails: any[] }> {
+    ): Promise<any[]> {
       if (documentsList === null) {
-        return { documentDetails: [] };
+        return [];
       }
     
       let documentDetails: any[] = [];
@@ -611,7 +611,7 @@ async getProblemsData(
           const response = await fetch(`${environment}/platform/document/v1/documents/${documentId}/content?admin-access=true`, requestOptions);
           if (response.ok) {
             const result = await response.json();
-
+    
             // Fetch direct-shares information
             const documentSharesFilter = `documentId=='${documentId}'`;
             const directSharesResponse = await fetch(`${environment}/platform/document/v1/direct-shares?filter=${encodeURIComponent(documentSharesFilter)}`, requestOptions);
@@ -623,7 +623,7 @@ async getProblemsData(
               const errorDetails = await directSharesResponse.text();
               this.log(LOG_LEVELS.ERROR, `Direct Shares Error: ${directSharesResponse.status} ${errorDetails}`);
             }
-
+    
             // Fetch environment-shares information
             const environmentSharesResponse = await fetch(`${environment}/platform/document/v1/environment-shares?filter=${encodeURIComponent(documentSharesFilter)}`, requestOptions);
             if (environmentSharesResponse.ok) {
@@ -634,7 +634,7 @@ async getProblemsData(
               const errorDetails = await environmentSharesResponse.text();
               this.log(LOG_LEVELS.ERROR, `Environment Shares Error: ${environmentSharesResponse.status} ${errorDetails}`);
             }
-
+    
             if (result.sections) {
               result.sections.forEach((section: any) => {
                 if (section.state) {
@@ -647,13 +647,14 @@ async getProblemsData(
                 }
               });
             }
+    
             documentDetails.push(result);
           } else {
             const errorDetails = await response.text();
             this.log(LOG_LEVELS.ERROR, `Document Details Error: ${response.status} ${errorDetails}`);
           }
         } catch (error) {
-          this.log(LOG_LEVELS.ERROR, `${error}`);    
+          this.log(LOG_LEVELS.ERROR, `${error}`);
         }
       }
     
@@ -662,10 +663,11 @@ async getProblemsData(
       const jsonSize = new Blob([jsonString]).size;
       this.log(LOG_LEVELS.DEBUG, "jsonSize:" + jsonSize);
       if (jsonSize > this.jsonSizeThreshold) {
+        this.log(LOG_LEVELS.DEBUG, "jsonSize exceed " + this.jsonSizeThreshold);
         documentDetails = [{ warning: "The size of the JSON output is too large" }];
       }
-
-      return { documentDetails};
+      this.log(LOG_LEVELS.DEBUG, "documentDetails:\n" + JSON.stringify(documentDetails, null, 2));
+      return documentDetails;
     }
 
     async generateAuditInfo({

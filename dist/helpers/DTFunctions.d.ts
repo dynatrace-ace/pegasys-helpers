@@ -79,9 +79,7 @@ declare class DTFunctions {
     getSettingsData(environment: string, entitiesList: any, headers: Headers, schemaId: string, scope: string): Promise<any[]>;
     getProblemsData(environment: string, entitiesList: any, headers: Headers): Promise<any>;
     getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any>;
-    getDocumentDetails(environment: string, documentsList: any, headers: Headers): Promise<{
-        documentDetails: any[];
-    }>;
+    getDocumentDetails(environment: string, documentsList: any, headers: Headers): Promise<any[]>;
     generateAuditInfo({ documentList, documentDetails, entitiesList, entitiesData, settingsData, configList, configDetails, problemsData, userDashboardList, userDashboardDetails }: AuditInfoParams): Promise<any>;
     checkKeywordsExistence(inputValue: string, keywords: string[]): boolean;
     findIdInObject(object: any): string | null;
