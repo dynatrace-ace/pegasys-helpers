@@ -659,8 +659,10 @@ async getProblemsData(
               }
             });
           }
+            this.log(LOG_LEVELS.DEBUG, "auditResult:" + JSON.stringify(auditResult, null, 2));
             auditDocumentDetails.push(auditResult);
             documentDetails.push(result);
+            this.log(LOG_LEVELS.DEBUG, "auditDocumentDetails:" + JSON.stringify(auditDocumentDetails, null, 2));
           } else {
             const errorDetails = await response.text();
             this.log(LOG_LEVELS.ERROR, `Document Details Error: ${response.status} ${errorDetails}`);
