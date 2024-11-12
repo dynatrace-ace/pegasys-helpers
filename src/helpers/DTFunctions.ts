@@ -138,6 +138,7 @@ class DTFunctions {
     const problemsData = await this.getProblemsData(dt_gen2_environment, entitiesList, auth_header);
  
     // Get Dashboard List
+
     const classicDashboardList = await this.getClassicDashboardList(dt_gen2_environment, auth_header);
     const classicDashboardDetails = await this.getDashboardsData(dt_gen2_environment, classicDashboardList, auth_header);
 
@@ -152,6 +153,7 @@ class DTFunctions {
       problemsData: problemsData,
       classicDashboardList: classicDashboardList,
       classicDashboardDetails: classicDashboardDetails
+
     });
 
     // Get the score
@@ -292,7 +294,9 @@ class DTFunctions {
 
 
   // A utility function to get the dashboard configs list
+
   async getClassicDashboardList(
+
     environment: string,
     headers: Headers
   ): Promise<any[]> {
@@ -319,7 +323,9 @@ class DTFunctions {
       }
       this.log(LOG_LEVELS.DEBUG, "user_dashboard_list:\n" + JSON.stringify(user_dashboard_list[0].dashboards, null, 2));
     } catch (error) {
+
       this.log(LOG_LEVELS.ERROR, `getClassicDashboardList Error: ${error}`);
+
     }
 
     return user_dashboard_list;
@@ -384,6 +390,7 @@ class DTFunctions {
       let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
       config_list.push(result);
     }
+
     // Filter the config_list based on config_name_to_query
     if (config_name_to_query != "") {
       config_list = config_list.map(config => {
@@ -394,6 +401,7 @@ class DTFunctions {
       }).filter(config => config.values.length > 0);
     }
   
+
     return config_list;
   }
 
@@ -689,6 +697,7 @@ async getProblemsData(
       problemsData,
       classicDashboardList,
       classicDashboardDetails
+
     }: AuditInfoParams): Promise<any> {
       let audit_info: any = {};
     
@@ -724,12 +733,14 @@ async getProblemsData(
         audit_info["problemsData"] = problemsData;
       }
 
+
       if (classicDashboardList != null) {
         audit_info["classicDashboardList"] = classicDashboardList;
       }
 
       if (classicDashboardDetails != null) {
         audit_info["classicDashboardDetails"] = classicDashboardDetails;
+
       }
     
       audit_info.assertionFails = [];
