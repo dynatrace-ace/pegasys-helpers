@@ -46,8 +46,8 @@ interface AuditInfoParams {
     configList?: any;
     configDetails?: any;
     problemsData?: any;
-    userDashboardList?: any;
-    userDashboardDetails?: any;
+    classicDashboardList?: any;
+    classicDashboardDetails?: any;
 }
 declare class DTFunctions {
     private currentLogLevel;
@@ -71,7 +71,7 @@ declare class DTFunctions {
     getAuthorizationHeaderGen2(token: string): Promise<Headers>;
     getEntities(environment: string, entity_type: string, entity_name_to_query: string, headers: Headers): Promise<any>;
     getEntitiesData(environment: string, entitiesList: any, headers: Headers): Promise<any[]>;
-    getUserDashboardList(environment: string, headers: Headers): Promise<any[]>;
+    getClassicDashboardList(environment: string, headers: Headers): Promise<any[]>;
     getDashboardsData(environment: string, dashboardList: any, headers: Headers): Promise<any[]>;
     getConfigsList(environment: string, config_endpoint: string, config_name_to_query: string, config_endpoint_extra_param: string, entitiesList: any, headers: Headers): Promise<any[]>;
     callConfigList(environment: string, config_endpoint: string, config_name_to_query: string, parameters: string, headers: Headers): Promise<any>;
@@ -80,7 +80,7 @@ declare class DTFunctions {
     getProblemsData(environment: string, entitiesList: any, headers: Headers): Promise<any>;
     getDocumentsList(environment: string, document_type: string, document_name_to_query: string, headers: Headers): Promise<any>;
     getDocumentDetails(environment: string, documentsList: any, headers: Headers): Promise<any[]>;
-    generateAuditInfo({ documentList, documentDetails, entitiesList, entitiesData, settingsData, configList, configDetails, problemsData, userDashboardList, userDashboardDetails }: AuditInfoParams): Promise<any>;
+    generateAuditInfo({ documentList, documentDetails, entitiesList, entitiesData, settingsData, configList, configDetails, problemsData, classicDashboardList, classicDashboardDetails }: AuditInfoParams): Promise<any>;
     checkKeywordsExistence(inputValue: string, keywords: string[]): boolean;
     findIdInObject(object: any): string | null;
     log(level: LOG_LEVELS, message: string): void;
