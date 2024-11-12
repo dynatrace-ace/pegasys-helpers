@@ -129,7 +129,6 @@ class DTFunctions {
   
     // Get API v1 config data
     const configList = await this.getConfigsList(dt_gen2_environment, config_endpoint, config_name_to_query, config_endpoint_extra_param, entitiesList, auth_header);
-  
     const configDetails = await this.getConfigsData(dt_gen2_environment, config_endpoint, configList, auth_header);
 
     // Get the settings data
@@ -385,7 +384,16 @@ class DTFunctions {
       let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
       config_list.push(result);
     }
-
+    // Filter the config_list based on config_name_to_query
+    if (config_name_to_query != "") {
+      config_list = config_list.map(config => {
+        return {
+          ...config,
+          values: config.values.filter((item: any) => item.name.includes(config_name_to_query))
+        };
+      }).filter(config => config.values.length > 0);
+    }
+  
     return config_list;
   }
 
