@@ -46,8 +46,8 @@ interface AuditInfoParams {
   configList?: any;
   configDetails?: any;
   problemsData?: any;
-  userDashboardList?: any;
-  userDashboardDetails?: any;
+  classicDashboardList?: any;
+  classicDashboardDetails?: any;
 }
 
 class DTFunctions {
@@ -129,7 +129,6 @@ class DTFunctions {
   
     // Get API v1 config data
     const configList = await this.getConfigsList(dt_gen2_environment, config_endpoint, config_name_to_query, config_endpoint_extra_param, entitiesList, auth_header);
-  
     const configDetails = await this.getConfigsData(dt_gen2_environment, config_endpoint, configList, auth_header);
 
     // Get the settings data
@@ -139,8 +138,9 @@ class DTFunctions {
     const problemsData = await this.getProblemsData(dt_gen2_environment, entitiesList, auth_header);
  
     // Get Dashboard List
-    const userDashboardList = await this.getUserDashboardList(dt_gen2_environment, auth_header);
-    const userDashboardDetails = await this.getDashboardsData(dt_gen2_environment, userDashboardList, auth_header);
+
+    const classicDashboardList = await this.getClassicDashboardList(dt_gen2_environment, auth_header);
+    const classicDashboardDetails = await this.getDashboardsData(dt_gen2_environment, classicDashboardList, auth_header);
 
 
       // Generate Audit Info
@@ -151,8 +151,9 @@ class DTFunctions {
       configList: configList,
       configDetails: configDetails,
       problemsData: problemsData,
-      userDashboardList: userDashboardList,
-      userDashboardDetails: userDashboardDetails
+      classicDashboardList: classicDashboardList,
+      classicDashboardDetails: classicDashboardDetails
+
     });
 
     // Get the score
@@ -293,7 +294,9 @@ class DTFunctions {
 
 
   // A utility function to get the dashboard configs list
-  async getUserDashboardList(
+
+  async getClassicDashboardList(
+
     environment: string,
     headers: Headers
   ): Promise<any[]> {
@@ -320,7 +323,9 @@ class DTFunctions {
       }
       this.log(LOG_LEVELS.DEBUG, "user_dashboard_list:\n" + JSON.stringify(user_dashboard_list[0].dashboards, null, 2));
     } catch (error) {
-      this.log(LOG_LEVELS.ERROR, `getUserDashboardList Error: ${error}`);
+
+      this.log(LOG_LEVELS.ERROR, `getClassicDashboardList Error: ${error}`);
+
     }
 
     return user_dashboard_list;
@@ -385,6 +390,17 @@ class DTFunctions {
       let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
       config_list.push(result);
     }
+
+    // Filter the config_list based on config_name_to_query
+    if (config_name_to_query != "") {
+      config_list = config_list.map(config => {
+        return {
+          ...config,
+          values: config.values.filter((item: any) => item.name.includes(config_name_to_query))
+        };
+      }).filter(config => config.values.length > 0);
+    }
+  
 
     return config_list;
   }
@@ -679,8 +695,9 @@ async getProblemsData(
       configList,
       configDetails,
       problemsData,
-      userDashboardList,
-      userDashboardDetails
+      classicDashboardList,
+      classicDashboardDetails
+
     }: AuditInfoParams): Promise<any> {
       let audit_info: any = {};
     
@@ -716,12 +733,14 @@ async getProblemsData(
         audit_info["problemsData"] = problemsData;
       }
 
-      if (userDashboardList != null) {
-        audit_info["userDashboardList"] = userDashboardList;
+
+      if (classicDashboardList != null) {
+        audit_info["classicDashboardList"] = classicDashboardList;
       }
 
-      if (userDashboardDetails != null) {
-        audit_info["userDashboardDetails"] = userDashboardDetails;
+      if (classicDashboardDetails != null) {
+        audit_info["classicDashboardDetails"] = classicDashboardDetails;
+
       }
     
       audit_info.assertionFails = [];
