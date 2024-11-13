@@ -381,14 +381,17 @@ class DTFunctions {
         config_list.push(result);
       }
       this.log(LOG_LEVELS.DEBUG, "Config List with extra param /");
+      this.log(LOG_LEVELS.DEBUG, "config_list:\n" + JSON.stringify(config_list, null, 2));
     } else if (config_endpoint_extra_param.includes("?")) {
       parameters = config_endpoint_extra_param;
       let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
       config_list.push(result);
       this.log(LOG_LEVELS.DEBUG, "Config List with extra param ?");
     } else {
+      this.log(LOG_LEVELS.DEBUG, "Config List with no param");
       let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
       config_list.push(result);
+      this.log(LOG_LEVELS.DEBUG, "config_list before:\n" + JSON.stringify(config_list, null, 2));
       // Filter the config_list based on config_name_to_query
       if (config_name_to_query != "") {
         config_list = config_list.map(config => {
@@ -398,6 +401,7 @@ class DTFunctions {
           };
         }).filter(config => config.values.length > 0);
       }
+      this.log(LOG_LEVELS.DEBUG, "config_list after:\n" + JSON.stringify(config_list, null, 2));
     }
 
 
