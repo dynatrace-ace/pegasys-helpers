@@ -373,22 +373,28 @@ class DTFunctions {
       return [];
     }
     let parameters = "";
-    if (config_endpoint_extra_param.includes("/") && !entitiesList) {
+    this.log(LOG_LEVELS.DEBUG, "entitieslist in config_list:\n" + JSON.stringify(entitiesList, null, 2));
+    this.log(LOG_LEVELS.DEBUG, "config_endpoint_extra_param:" + config_endpoint_extra_param);
+    if (config_endpoint_extra_param.includes("/") && entitiesList) {
+      this.log(LOG_LEVELS.DEBUG, "Config List with extra param /");
       for (const entity of entitiesList.entities) {
         const entityId = entity.entityId;
         parameters = "/" + entityId + config_endpoint_extra_param;
         let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
         config_list.push(result);
       }
-      this.log(LOG_LEVELS.DEBUG, "Config List with extra param /");
+
+      this.log(LOG_LEVELS.DEBUG, "config_list:\n" + JSON.stringify(config_list, null, 2));
     } else if (config_endpoint_extra_param.includes("?")) {
+      this.log(LOG_LEVELS.DEBUG, "Config List with extra param ?");
       parameters = config_endpoint_extra_param;
       let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
       config_list.push(result);
-      this.log(LOG_LEVELS.DEBUG, "Config List with extra param ?");
     } else {
+      this.log(LOG_LEVELS.DEBUG, "Config List with no param");
       let result = await this.callConfigList(environment, config_endpoint, config_name_to_query, parameters, headers);
       config_list.push(result);
+      this.log(LOG_LEVELS.DEBUG, "config_list before:\n" + JSON.stringify(config_list, null, 2));
       // Filter the config_list based on config_name_to_query
       if (config_name_to_query != "") {
         config_list = config_list.map(config => {
@@ -398,6 +404,7 @@ class DTFunctions {
           };
         }).filter(config => config.values.length > 0);
       }
+      this.log(LOG_LEVELS.DEBUG, "config_list after:\n" + JSON.stringify(config_list, null, 2));
     }
 
 
