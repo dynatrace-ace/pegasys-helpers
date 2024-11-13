@@ -375,7 +375,7 @@ class DTFunctions {
     let parameters = "";
     this.log(LOG_LEVELS.DEBUG, "entitieslist in config_list:\n" + JSON.stringify(entitiesList, null, 2));
     this.log(LOG_LEVELS.DEBUG, "config_endpoint_extra_param:" + config_endpoint_extra_param);
-    if (config_endpoint_extra_param.includes("/") && !entitiesList) {
+    if (config_endpoint_extra_param.includes("/") && entitiesList) {
       this.log(LOG_LEVELS.DEBUG, "Config List with extra param /");
       for (const entity of entitiesList.entities) {
         const entityId = entity.entityId;
